@@ -221,8 +221,8 @@ export default function App() {
                     transition={{ duration: 0.18 }}
                     className="fixed inset-0 z-50"
                   >
-                    {/* Backdrop */}
-                    <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)} />
+                    {/* Backdrop (z-40 to ensure click) */}
+                    <div className="absolute inset-0 bg-black/60 z-40" onClick={() => setMobileMenuOpen(false)} />
 
                     {/* Panel */}
                     <motion.nav
@@ -230,10 +230,15 @@ export default function App() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -18, opacity: 0 }}
                       transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-                      className="relative bg-gradient-to-br from-black/95 to-black/90 rounded-b-2xl mx-4 mt-6 p-4 shadow-2xl border border-transparent max-w-md"
+                      className="relative bg-gradient-to-br from-black/95 to-black/90 rounded-b-2xl mx-4 mt-6 p-4 shadow-2xl border border-transparent max-w-md z-50"
                       aria-label="Mobile navigation"
                     >
-                      <div className="flex flex-col gap-3 text-sm font-medium">
+                      <button
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-label="Fermer le menu"
+                        className="absolute right-4 top-4 bg-black/30 hover:bg-black/50 text-yellow-300 rounded-full w-9 h-9 flex items-center justify-center"
+                      >✕</button>
+                      <div className="flex flex-col gap-3 text-sm font-medium mt-10">
                         <button onClick={() => { setAboutOpen(true); setMobileMenuOpen(false); }} className="text-left hover:text-yellow-400 transition">À propos</button>
                         <button onClick={() => { setMobileMenuOpen(false); window.open('https://boxrec.com/en/proboxer/1128110', '_blank'); }} className="text-left hover:text-yellow-400 transition">Profil BoxRec</button>
                         <button onClick={() => { setMobileMenuOpen(false); window.open('https://www.tapology.com/fightcenter/fighters/387994-bakari-diallo', '_blank'); }} className="text-left hover:text-yellow-400 transition">Profil Tapology</button>

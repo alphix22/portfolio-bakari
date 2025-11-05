@@ -22,7 +22,7 @@ export default function App() {
     nickname: "BakBak",
     nationality: "Française",
     birth: "17 novembre 2003 — Garges-lès-Gonesse",
-    height: "1,80 m",
+        height: "1,80 m",
     weightClass: "Welters",
     roles: ["Boxeur professionnel", "Coach d'insertion par le sport", "Sapeur-pompier volontaire"],
   };
@@ -63,6 +63,7 @@ export default function App() {
   const timerRef = useRef(null);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [statsMenuOpen, setStatsMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const statsMenuRef = useRef(null);
   const statsButtonRef = useRef(null);
 
@@ -101,6 +102,14 @@ export default function App() {
     };
   }, [statsMenuOpen]);
 
+  // Close mobile menu on Escape
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setMobileMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [mobileMenuOpen]);
+
   useEffect(() => {
     // ensure current video's iframe is allowed to render
     setIframeLoadedIndex(current);
@@ -123,7 +132,7 @@ export default function App() {
       {/* Global smooth scroll */}
       <style>{`html{scroll-behavior:smooth} .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}`}</style>
 
-      <header className="bg-gradient-to-br from-black/95 via-black/90 to-black/95 shadow-2xl backdrop-blur-sm border-b border-yellow-500/10 sticky top-0 z-50">
+  <header className="bg-gradient-to-br from-black/95 via-black/90 to-black/95 shadow-2xl backdrop-blur-sm border-b border-transparent sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div className="flex items-center gap-3">
@@ -164,7 +173,7 @@ export default function App() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -6 }}
                       transition={{ type: 'spring', stiffness: 300, damping: 28 }}
-                      className="absolute left-0 mt-2 w-64 bg-black/90 rounded-lg shadow-2xl border border-yellow-500/10 z-40"
+                      className="absolute left-0 mt-2 w-64 bg-black/90 rounded-lg shadow-2xl border border-transparent z-40"
                     >
                       <div className="py-2">
                         <a
@@ -191,9 +200,52 @@ export default function App() {
               <a href="#contact" className="hover:text-yellow-400 transition" onClick={(e)=>{e.preventDefault(); document.getElementById('contact')?.scrollIntoView({behavior:'smooth'})}}>Réseaux</a>
             </nav>
 
-            {/* Mobile menu placeholder (keep minimal) */}
+            {/* Mobile menu (toggle + panel) */}
             <div className="md:hidden">
-              <button aria-label="Open menu" className="px-3 py-2 rounded bg-black/40">Menu</button>
+              <button
+                aria-label="Open menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => setMobileMenuOpen((s) => !s)}
+                className="px-3 py-2 rounded bg-black/40"
+              >
+                Menu
+              </button>
+
+              <AnimatePresence>
+                {mobileMenuOpen && (
+                  <motion.div
+                    key="mobile-menu"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="fixed inset-0 z-50"
+                  >
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)} />
+
+                    {/* Panel */}
+                    <motion.nav
+                      initial={{ y: -18, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: -18, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 28 }}
+                      className="relative bg-gradient-to-br from-black/95 to-black/90 rounded-b-2xl mx-4 mt-6 p-4 shadow-2xl border border-transparent max-w-md"
+                      aria-label="Mobile navigation"
+                    >
+                      <div className="flex flex-col gap-3 text-sm font-medium">
+                        <button onClick={() => { setAboutOpen(true); setMobileMenuOpen(false); }} className="text-left hover:text-yellow-400 transition">À propos</button>
+                        <button onClick={() => { setMobileMenuOpen(false); window.open('https://boxrec.com/en/proboxer/1128110', '_blank'); }} className="text-left hover:text-yellow-400 transition">Profil BoxRec</button>
+                        <button onClick={() => { setMobileMenuOpen(false); window.open('https://www.tapology.com/fightcenter/fighters/387994-bakari-diallo', '_blank'); }} className="text-left hover:text-yellow-400 transition">Profil Tapology</button>
+                        <button onClick={() => { setMobileMenuOpen(false); document.getElementById('palmares')?.scrollIntoView({behavior:'smooth'}) }} className="text-left hover:text-yellow-400 transition">Palmarès</button>
+                        <button onClick={() => { setMobileMenuOpen(false); document.getElementById('timeline')?.scrollIntoView({behavior:'smooth'}) }} className="text-left hover:text-yellow-400 transition">Chronologie</button>
+                        <button onClick={() => { setMobileMenuOpen(false); document.getElementById('videos')?.scrollIntoView({behavior:'smooth'}) }} className="text-left hover:text-yellow-400 transition">Vidéos</button>
+                        <button onClick={() => { setMobileMenuOpen(false); document.getElementById('contact')?.scrollIntoView({behavior:'smooth'}) }} className="text-left hover:text-yellow-400 transition">Réseaux</button>
+                      </div>
+                    </motion.nav>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -211,7 +263,7 @@ export default function App() {
             {/* Backdrop with blur for harmony */}
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setAboutOpen(false)} />
 
-            <motion.article
+              <motion.article
               role="dialog"
               aria-modal="true"
               aria-label="À propos de Bakari Diallo"
@@ -219,7 +271,7 @@ export default function App() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 28, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 280, damping: 28 }}
-              className="relative w-full max-w-5xl mx-4 bg-gradient-to-br from-black/85 to-black/70 rounded-2xl shadow-2xl border border-yellow-500/10 text-white overflow-auto max-h-[90vh]"
+              className="relative w-full max-w-5xl mx-4 bg-gradient-to-br from-black/85 to-black/70 rounded-2xl shadow-2xl border border-transparent text-white overflow-auto max-h-[90vh]"
             >
               <div className="p-6 lg:p-8">
                 <button
@@ -255,7 +307,7 @@ export default function App() {
           <div className="lg:col-span-2">
             <motion.div
               whileHover={{ scale: 1.01 }}
-              className="rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.12)] bg-gradient-to-r from-black/40 to-black/60 p-6 flex flex-col sm:flex-row items-center gap-6 border border-yellow-500/8 cursor-pointer"
+              className="rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(255,215,0,0.12)] bg-gradient-to-r from-black/40 to-black/60 p-6 flex flex-col sm:flex-row items-center gap-6 border border-transparent cursor-pointer"
               role="button"
               aria-label="Ouvrir À propos — Bakari Diallo"
               tabIndex={0}
@@ -275,17 +327,17 @@ export default function App() {
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-yellow-400 drop-shadow-md">{bio.name} <span className="text-lg text-white font-semibold opacity-90">— {bio.nickname}</span></h2>
                 <p className="mt-2 text-sm opacity-90">Boxeur professionnel français d’origine malienne, alliant puissance, technique et volume offensif. Une trajectoire ascendante pleine de promesses.</p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  {bio.roles.map((r) => (<span key={r} className="text-xs px-3 py-1 bg-yellow-400/8 border border-yellow-400/10 text-yellow-300 rounded-full">{r}</span>))}
+                  {bio.roles.map((r) => (<span key={r} className="text-xs px-3 py-1 bg-yellow-400/8 border border-transparent text-yellow-300 rounded-full">{r}</span>))}
                 </div>
               </div>
             </motion.div>
           </div>
 
-          <aside id="stats" className="bg-gradient-to-br from-yellow-500/8 to-black/28 rounded-2xl p-4 shadow-lg border border-yellow-500/6">
+          <aside id="stats" className="bg-gradient-to-br from-yellow-500/8 to-black/28 rounded-2xl p-4 shadow-lg border border-transparent">
             <h3 className="text-lg font-bold text-yellow-400">Statistiques pro</h3>
             <div className="mt-3 grid grid-cols-2 gap-3 text-center">
               {Object.entries(stats).map(([k, v]) => (
-                <motion.div key={k} whileHover={{ scale: 1.03 }} className="p-3 bg-black/40 rounded border border-yellow-400/8">
+                <motion.div key={k} whileHover={{ scale: 1.03 }} className="p-3 bg-black/40 rounded border border-transparent">
                   <div className="text-xs opacity-80">{statLabels[k] ?? k}</div>
                   <div className="text-2xl font-extrabold text-yellow-400">{v}</div>
                 </motion.div>
@@ -295,18 +347,18 @@ export default function App() {
         </section>
 
         {/* PALMARES */}
-        <section id="palmares" className="mt-10 bg-gradient-to-r from-black/50 to-black/70 rounded-2xl p-6 border border-yellow-500/8 shadow-lg">
+  <section id="palmares" className="mt-10 bg-gradient-to-r from-black/50 to-black/70 rounded-2xl p-6 border border-transparent shadow-lg">
           <h3 className="text-2xl font-extrabold text-yellow-400">Palmarès</h3>
           <ul className="mt-4 space-y-3">
-            {palmares.map((p) => (<li key={p} className="bg-black/20 border border-yellow-500/8 p-3 rounded-lg hover:bg-yellow-500/8 transition">{p}</li>))}
+            {palmares.map((p) => (<li key={p} className="bg-black/20 border border-transparent p-3 rounded-lg hover:bg-yellow-500/8 transition">{p}</li>))}
           </ul>
         </section>
 
         {/* TIMELINE & STYLE */}
         <section id="timeline" className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <motion.div className="bg-gradient-to-br from-black/40 to-black/70 rounded-2xl p-6 border border-yellow-500/8 shadow-lg">
+          <motion.div className="bg-gradient-to-br from-black/40 to-black/70 rounded-2xl p-6 border border-transparent shadow-lg">
             <h4 className="text-xl font-bold text-yellow-400">Chronologie de carrière</h4>
-            <ol className="mt-4 border-l border-yellow-500/16 pl-4 space-y-4">
+            <ol className="mt-4 border-l border-yellow-500/12 pl-4 space-y-4">
               {timeline.map((t) => (
                 <motion.li key={t.year} className="relative" whileHover={{ x: 4 }}>
                   <div className="absolute -left-6 top-0 w-3 h-3 rounded-full bg-yellow-400 ring-4 ring-black" />
@@ -317,9 +369,8 @@ export default function App() {
             </ol>
           </motion.div>
 
-          <motion.div className="bg-gradient-to-br from-yellow-500/8 to-black/50 rounded-2xl p-6 flex flex-col gap-4 border border-yellow-500/8 text-center items-center" whileHover={{ scale: 1.02 }}>
+          <motion.div className="bg-gradient-to-br from-yellow-500/8 to-black/50 rounded-2xl p-6 flex flex-col gap-4 border border-transparent text-center items-center" whileHover={{ scale: 1.02 }}>
             <h4 className="text-xl font-bold text-yellow-400">Style de boxe</h4>
-            <br></br>
             <br></br>
             <p className="opacity-90">Boxeur à fort volume de coups, alliant explosivité, gestion du rythme et précision. Toujours à la recherche de la finition rapide.</p>
             <motion.blockquote className="italic opacity-80 text-yellow-300" whileHover={{ scale: 1.02 }}>« Boxer à haute intensité : imposer le rythme, aller au corps, terminer le combat. »</motion.blockquote>
@@ -327,7 +378,7 @@ export default function App() {
         </section>
 
         {/* VIDEOS (lazy iframe + carousel + thumbnails) */}
-        <section id="videos" className="mt-10 bg-gradient-to-r from-black/50 to-black/70 rounded-2xl p-6 border border-yellow-500/8 shadow-lg">
+  <section id="videos" className="mt-10 bg-gradient-to-r from-black/50 to-black/70 rounded-2xl p-6 border border-transparent shadow-lg">
           <h3 className="text-2xl font-extrabold text-yellow-400">Vidéos & Interviews</h3>
           <p className="mt-2 text-sm opacity-80"></p>
 
@@ -395,7 +446,7 @@ export default function App() {
         </section>
 
         {/* SOCIALS */}
-        <section id="contact" className="mt-10 bg-gradient-to-r from-yellow-500/8 to-black/50 rounded-2xl p-6 text-center border border-yellow-500/8 shadow-lg">
+  <section id="contact" className="mt-10 bg-gradient-to-r from-yellow-500/8 to-black/50 rounded-2xl p-6 text-center border border-transparent shadow-lg">
           <h3 className="text-2xl font-extrabold mb-6 text-yellow-400">Réseaux officiels</h3>
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             {socialLinks.map((link) => (
@@ -416,7 +467,7 @@ export default function App() {
           </div>
         </section>
 
-        <footer className="mt-8 py-6 text-center text-yellow-400 opacity-90 text-xs tracking-wide border-t border-yellow-500/8">
+        <footer className="mt-8 py-6 text-center text-yellow-400 opacity-90 text-xs tracking-wide border-t border-transparent">
           © {new Date().getFullYear()} {bio.name} — Portfolio. Tous droits réservés.
         </footer>
       </motion.main>
